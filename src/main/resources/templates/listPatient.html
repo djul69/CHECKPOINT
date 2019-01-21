@@ -1,0 +1,79 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Person List</title>
+    <link rel="stylesheet" type="text/css"  th:href="@{../../css/style.css}"/>
+</head>
+<body>
+<h1>Liste des Patients</h1>
+<input type="button" name="add" onclick="location.href='http://localhost:8080/addPatient'" value="Ajouter une personne" />
+<br/><br/>
+<div>
+    <table border="1">
+        <tr>
+            <th>Id</th>
+            <th>Nom</th>
+            <th>Prenom</th>
+            <th>Numero de secu</th>
+            <th>Commentaires</th>
+            <th>Code sexe</th>
+            <th>Annee de naissance</th>
+            <th>Mois de naissance</th>
+            <th>Departement</th>
+            <th>Commune</th>
+        </tr>
+
+        <tr th:each ="patient : ${patients}">
+            <td th:utext="${patient.id_patient}">...</td>
+            <td th:utext="${patient.nom}">...</td>
+            <td th:utext="${patient.prenom}">...</td>
+            <td th:utext="${patient.num}">...</td>
+            <td th:utext="${patient.commentaires}">...</td>
+            <td th:utext="${patient.codeSexe}">...</td>
+            <td th:utext="${patient.annee}">...</td>
+            <td th:utext="${patient.mois}">...</td>
+            <td th:utext="${patient.dep}">...</td>
+            <td th:utext="${patient.commune}">...</td>
+        </tr>
+    </table>
+</div>
+</br>
+</br>
+<div>
+    <form th:action="@{/deletePerson}"
+          th:object="${deleteForm}" method="POST">
+        Id du patient à supprimer :
+        <input id="idSuppr" type="text" th:field="*{id_patient}" />
+        <br/>
+        <input id="suppr" type="submit" value="Supprimer" />
+    </form>
+</div>
+<div th:if="${errorMessage2}" th:utext="${errorMessage2}"
+     style="color:red;font-style:italic;">
+    ...
+</div>
+</br>
+</br>
+<div>
+    <form th:action="@{/searchByNumSec}"
+          th:object="${secuForm}" method="POST">
+        Numéro de sécu du patient à rechercher :
+        <input id="idSearchByNum" type="text" th:field="*{num}" />
+        <br/>
+        <input id="searchByNum" type="submit" value="Lancer" />
+    </form>
+</div>
+</br>
+</br>
+<div>
+    <form th:action="@{/searchByName}"
+          th:object="${nomForm}" method="POST">
+        Nom du patient à rechercher :
+        <input id="idSearchByname" type="text" th:field="*{nom}" />
+        <br/>
+        <input id="searchByname" type="submit" value="Lancer" />
+    </form>
+</div>
+</body>
+</html>
