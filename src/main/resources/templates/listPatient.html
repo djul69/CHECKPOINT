@@ -22,6 +22,7 @@
             <th>Mois de naissance</th>
             <th>Departement</th>
             <th>Commune</th>
+            <th>Nom commune</th>
         </tr>
 
         <tr th:each ="patient : ${patients}">
@@ -35,6 +36,7 @@
             <td th:utext="${patient.mois}">...</td>
             <td th:utext="${patient.dep}">...</td>
             <td th:utext="${patient.commune}">...</td>
+            <td th:utext="${patient.communeLibelle}">...</td>
         </tr>
     </table>
 </div>

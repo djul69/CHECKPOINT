@@ -12,6 +12,7 @@ public class PatientForm {
     private int mois;
     private int dep;
     private int commune;
+    private String communeLibelle;
 
     public String getNom() {
         return nom;
@@ -83,5 +84,13 @@ public class PatientForm {
 
     public void setCommune(int commune) {
         this.commune = commune;
+    }
+
+    public String getCommuneLibelle() {
+        return communeLibelle;
+    }
+
+    public void setCommuneLibelle(String communeLibelle) {
+        this.communeLibelle = communeLibelle;
     }
 }

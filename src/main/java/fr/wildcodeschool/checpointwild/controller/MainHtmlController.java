@@ -1,5 +1,6 @@
 package fr.wildcodeschool.checpointwild.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.wildcodeschool.checpointwild.dao.PatientRepository;
 import fr.wildcodeschool.checpointwild.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,15 +10,26 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.thymeleaf.util.StringUtils;
 
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.List;
 import java.util.stream.Collectors;
 
+
 @Controller
-public class mainHtmlController {
+public class MainHtmlController {
 
     @Autowired
     private PatientRepository patientRepository;
+    @Autowired
+    private FullRestController fullRestController;
+
+    private final String GEOURL = "https://geo.api.gouv.fr/communes/";
 
     @Value("${error.message}")
     private String errorMessage;
@@ -34,14 +46,15 @@ public class mainHtmlController {
     }
 
     @RequestMapping(value = {"/listPatient"}, method = RequestMethod.GET)
-    public String personList(Model model) {
-        for (Patient patient :patientRepository.findAll()
-             ) {
-            patient.setCodeSexe(Integer.parseInt(patient.getNum().substring(0,1)));
-            patient.setAnnee(Integer.parseInt(patient.getNum().substring(1,3)));
-            patient.setMois(Integer.parseInt(patient.getNum().substring(3,5)));
-            patient.setDep(Integer.parseInt(patient.getNum().substring(5,7)));
-            patient.setCommune(Integer.parseInt(patient.getNum().substring(7,10)));
+    public String personList(Model model) throws IOException {
+        for (Patient patient : patientRepository.findAll()
+        ) {
+            patient.setCodeSexe(Integer.parseInt(patient.getNum().substring(0, 1)));
+            patient.setAnnee(Integer.parseInt(patient.getNum().substring(1, 3)));
+            patient.setMois(Integer.parseInt(patient.getNum().substring(3, 5)));
+            patient.setDep(Integer.parseInt(patient.getNum().substring(5, 7)));
+            patient.setCommune(Integer.parseInt(patient.getNum().substring(7, 10)));
+            patient.setCommuneLibelle(getInfosCommunes(StringUtils.concat(patient.getDep(), patient.getCommune())));
         }
         model.addAttribute("patients", patientRepository.findAll());
         DeleteForm deleteForm = new DeleteForm();
@@ -88,18 +101,29 @@ public class mainHtmlController {
         return "listPatient";
     }
 
-    @RequestMapping(value ={"/searchByNumSec"} , method = RequestMethod.POST)
-    public String searchByNumSecu (Model model, @ModelAttribute("secuForm") SecuForm secuForm){
+    @RequestMapping(value = {"/searchByNumSec"}, method = RequestMethod.POST)
+    public String searchByNumSecu(Model model, @ModelAttribute("secuForm") SecuForm secuForm) {
         String num_secu = secuForm.getNum();
         model.addAttribute("patients", patientRepository.findPatientByNumContains(num_secu));
         return "searchByNumSec";
     }
 
-    @RequestMapping(value ={"/searchByName"} , method = RequestMethod.POST)
-    public String searchByName(Model model, @ModelAttribute("nomForm") NomForm nomForm){
+    @RequestMapping(value = {"/searchByName"}, method = RequestMethod.POST)
+    public String searchByName(Model model, @ModelAttribute("nomForm") NomForm nomForm) {
         String nom = nomForm.getNom();
-        List<Patient> myList= patientRepository.findAll().stream().filter(x -> (x.getNom()).equals(nom)).collect(Collectors.toList());
+        List<Patient> myList = patientRepository.findAll().stream().filter(x -> (x.getNom().toLowerCase()).equals(nom)).collect(Collectors.toList());
         model.addAttribute("patients", myList);
         return "searchByName";
+    }
+
+    private String getInfosCommunes(String codeCommune) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        JsonGeo jsonGeo = new JsonGeo();
+        URL url = new URL(GEOURL + codeCommune);
+        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+        try (InputStream in = new BufferedInputStream(urlConnection.getInputStream())){
+            jsonGeo = mapper.readValue(in, JsonGeo.class);
+        }
+        return jsonGeo.getNom();
     }
 }

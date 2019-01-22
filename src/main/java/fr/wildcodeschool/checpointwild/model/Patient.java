@@ -23,6 +23,8 @@ public class Patient {
     private int dep;
     @Transient
     private int commune;
+    @Transient
+    private String communeLibelle;
 
     public Patient() {
     }
@@ -112,5 +114,13 @@ public class Patient {
 
     public void setCommune(int commune) {
         this.commune = commune;
+    }
+
+    public String getCommuneLibelle() {
+        return communeLibelle;
+    }
+
+    public void setCommuneLibelle(String communeLibelle) {
+        this.communeLibelle = communeLibelle;
     }
 }

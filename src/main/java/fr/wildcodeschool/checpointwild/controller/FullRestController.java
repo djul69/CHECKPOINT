@@ -3,15 +3,17 @@ package fr.wildcodeschool.checpointwild.controller;
 import fr.wildcodeschool.checpointwild.dao.PatientRepository;
 import fr.wildcodeschool.checpointwild.model.Patient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.xml.ws.Response;
 import java.util.List;
+import java.util.Map;
 
 @RestController
-public class restController {
+public class FullRestController {
     @Autowired
     PatientRepository patientRepository;
-    private final String GEOURL = "https://api.gouv.fr/api/api-geo.htmlcommunes";
 
     @GetMapping("/patients")
     private List<Patient> GetAllPatients() {
@@ -45,10 +47,5 @@ public class restController {
         }
         patientRepository.save(patient);
         return "le patient a été enregistré";
-    }
-
-    @PostMapping(GEOURL+"/{code}")
-            private void getInfosCommunes(@PathVariable int idCommune){
-
     }
 }
